@@ -4,12 +4,16 @@ title: About
 permalink: /about/
 ---
 
-Some information about you!
+Hi, I am patelnix.
 
-### More Information
+I use this site to share projects, notes, and occasional blog posts.
 
-A place to include any other types of information that you'd like to include about yourself.
+### What you will find here
 
-### Contact me
+- Project updates
+- Technical write-ups
+- Personal experiments
 
-[email@domain.com](mailto:email@domain.com)
+### Contact
+
+Open an issue or connect through my GitHub profile.
