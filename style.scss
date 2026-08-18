@@ -28,7 +28,6 @@ body {
   max-width: 740px;
   padding: 0 10px;
   width: 100%;
-  background: #202124;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -186,12 +185,22 @@ img {
     gap: 14px;
   }
 
+  .site-title-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   @include mobile {
     display: block;
     margin: 0 auto;
 
     .site-header-main {
       justify-content: center;
+    }
+
+    .site-title-block {
+      align-items: center;
     }
   }
 }
@@ -207,7 +216,7 @@ img {
 }
 
 .site-description {
-  margin: -5px 0 0 0;
+  margin: 2px 0 0 0;
   color: #aeb3ba;
   font-size: 16px;
 
