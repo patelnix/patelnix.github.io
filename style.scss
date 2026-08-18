@@ -259,6 +259,33 @@ nav {
   background: #fafafa;
 }
 
+.home-social {
+  margin-bottom: 34px;
+  padding: 16px 20px;
+  border: 1px dashed $lightGray;
+  border-radius: 10px;
+  text-align: center;
+
+  h2 {
+    margin: 0 0 4px 0;
+  }
+
+  .posts-intro {
+    margin: 0 0 8px 0;
+    color: $gray;
+  }
+
+  .social-links {
+    margin-top: 6px;
+  }
+
+  .svg-icon {
+    width: 26px;
+    height: 26px;
+    margin: 0 8px;
+  }
+}
+
 .home-posts {
   padding-top: 12px;
 

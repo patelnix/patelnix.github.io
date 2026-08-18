@@ -25,13 +25,21 @@ layout: default
   <a href="{{ site.baseurl }}/about/" class="read-more">Read full About page</a>
 </article>
 
+<section class="home-social">
+  <h2>Connect</h2>
+  <p class="posts-intro">Find me on GitHub and LinkedIn.</p>
+  <div class="social-links">
+    {% include svg-icons.html %}
+  </div>
+</section>
+
 <section id="latest-posts" class="home-posts">
   <h2>Latest Posts</h2>
   <p class="posts-intro">Notes, experiments, and project updates from my engineering journey.</p>
   <p><a href="{{ site.baseurl }}/blog/" class="read-more">View all posts</a></p>
 
   <div class="posts">
-  {% for post in site.posts %}
+  {% for post in site.posts limit:3 %}
     <article class="post post-card">
 
       <h3 class="post-card-title"><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h3>
