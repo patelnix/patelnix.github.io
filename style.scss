@@ -251,6 +251,28 @@ nav {
   border-bottom: none;
 }
 
+.home-about {
+  margin-bottom: 40px;
+  padding: 22px;
+  border: 1px solid $lightGray;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.home-posts {
+  padding-top: 12px;
+
+  h2 {
+    margin-bottom: 6px;
+  }
+
+  .posts-intro {
+    margin-top: 0;
+    margin-bottom: 22px;
+    color: $gray;
+  }
+}
+
 .post {
   blockquote {
     margin: 1.8em .8em;

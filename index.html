@@ -2,11 +2,11 @@
 layout: default
 ---
 
-<article class="post">
+<article class="post home-about">
   <h1>About Me</h1>
 
   <div class="entry">
-    <p>Hi, I am Nirmal.</p>
+    <p>Hi, Visitor.</p>
 
     <p>I am an Embedded Software Engineer with a strong focus on Linux systems and low-level software development. As a Linux kernel maintainer, I enjoy working close to the hardware, solving practical problems, and contributing to software that powers millions of devices.</p>
 
@@ -25,7 +25,11 @@ layout: default
   <a href="{{ site.baseurl }}/about/" class="read-more">Read full About page</a>
 </article>
 
-<div class="posts">
+<section id="latest-posts" class="home-posts">
+  <h2>Latest Posts</h2>
+  <p class="posts-intro">Notes, experiments, and project updates from my engineering journey.</p>
+
+  <div class="posts">
   {% for post in site.posts %}
     <article class="post">
 
@@ -35,7 +39,8 @@ layout: default
         {{ post.excerpt }}
       </div>
 
-      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read Post</a>
     </article>
   {% endfor %}
-</div>
+  </div>
+</section>
