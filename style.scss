@@ -156,16 +156,12 @@ img {
 }
 
 .masthead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  display: block;
   padding: 20px 0;
   border-bottom: 1px solid #32353a;
 
   @include mobile {
     text-align: center;
-    display: block;
   }
 }
 
@@ -184,8 +180,6 @@ img {
 }
 
 .site-info {
-  flex: 1;
-
   .site-header-main {
     display: flex;
     align-items: center;
@@ -223,7 +217,7 @@ img {
 }
 
 nav {
-  margin-top: 0;
+  margin-top: 14px;
   font-family: $bodyFont;
   font-size: 18px;
 
@@ -234,9 +228,9 @@ nav {
   }
 
   a {
-    margin-left: 20px;
+    margin-right: 20px;
     color: #b7bcc3;
-    text-align: right;
+    text-align: left;
     font-weight: 600;
     letter-spacing: 1px;
 
