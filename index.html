@@ -26,11 +26,8 @@ layout: default
 
 <section id="latest-posts" class="home-posts">
   <h2>Latest Posts</h2>
-  <p class="posts-intro">Notes, experiments, and project updates from my journey.</p>
-  <p><a href="{{ site.baseurl }}/blog/" class="read-more">View all posts</a></p>
-
   <div class="posts">
-  {% for post in site.posts limit:3 %}
+  {% for post in site.posts limit:1 %}
     <article class="post post-card">
 
       <h3 class="post-card-title"><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h3>
@@ -44,4 +41,6 @@ layout: default
     </article>
   {% endfor %}
   </div>
+
+  <p><a href="{{ site.baseurl }}/blog/" class="read-more">View all posts</a></p>
 </section>

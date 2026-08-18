@@ -19,7 +19,7 @@ html {
 
 body {
 	background: #2f3032;
-  font: 18px/1.4 $bodyFont;
+  font: 16px/1.32 $bodyFont;
   color: #cfd1d4;
 }
 
@@ -35,8 +35,8 @@ h1, h2, h3, h4, h5, h6 {
   color: #e6e8eb;
   font-weight: bold;
 
-  line-height: 1.7;
-  margin: 1em 0 15px;
+  line-height: 1.4;
+  margin: 0.55em 0 10px;
   padding: 0;
 
   @include mobile {
@@ -45,18 +45,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 30px;
+  font-size: 26px;
   a {
     color: inherit;
   }
 }
 
 h2 {
-  font-size: 24px;
+  font-size: 21px;
 }
 
 h3 {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 h4 {
@@ -65,7 +65,7 @@ h4 {
 }
 
 p {
-  margin: 15px 0;
+  margin: 10px 0;
 }
 
 a {
@@ -151,12 +151,12 @@ img {
 //
 
 .wrapper-masthead {
-  margin-bottom: 50px;
+  margin-bottom: 24px;
 }
 
 .masthead {
   display: block;
-  padding: 20px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #32353a;
 
   @include mobile {
@@ -165,8 +165,8 @@ img {
 }
 
 .site-avatar {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   flex: 0 0 auto;
 
   @include mobile {
@@ -182,7 +182,7 @@ img {
   .site-header-main {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
   }
 
   .site-title-block {
@@ -211,14 +211,14 @@ img {
   cursor: pointer;
   font-family: $headingFont;
   font-weight: 300;
-  font-size: 28px;
+  font-size: 24px;
   letter-spacing: 1px;
 }
 
 .site-description {
   margin: 2px 0 0 0;
   color: #aeb3ba;
-  font-size: 16px;
+  font-size: 14px;
 
   @include mobile {
     margin: 3px 0;
@@ -226,11 +226,11 @@ img {
 }
 
 nav {
-  margin-top: 14px;
+  margin-top: 10px;
   margin-left: 84px;
   text-align: right;
   font-family: $bodyFont;
-  font-size: 18px;
+  font-size: 16px;
 
   @include mobile {
     margin-top: 12px;
@@ -241,7 +241,7 @@ nav {
   }
 
   a {
-    margin-left: 20px;
+    margin-left: 14px;
     margin-right: 0;
     color: #b7bcc3;
     font-weight: 600;
@@ -259,26 +259,26 @@ nav {
 //
 
 .posts > .post {
-  padding-bottom: 2em;
+  padding-bottom: 1.1em;
   border-bottom: 1px solid #32353a;
 }
 
 .posts > .post:last-child {
-  padding-bottom: 1em;
+  padding-bottom: 0.6em;
   border-bottom: none;
 }
 
 .home-about {
-  margin-bottom: 40px;
-  padding: 22px;
+  margin-bottom: 16px;
+  padding: 14px;
   border: 1px solid #363a3f;
   border-radius: 10px;
   background: #25272b;
 }
 
 .home-social {
-  margin-bottom: 34px;
-  padding: 16px 20px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
   border: 1px dashed #40444a;
   border-radius: 10px;
   text-align: center;
@@ -290,6 +290,7 @@ nav {
   .posts-intro {
     margin: 0 0 8px 0;
     color: #aeb3ba;
+    font-size: 14px;
   }
 
   .social-links {
@@ -297,9 +298,9 @@ nav {
   }
 
   .svg-icon {
-    width: 34px;
-    height: 34px;
-    margin: 0 10px;
+    width: 28px;
+    height: 28px;
+    margin: 0 7px;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -308,7 +309,7 @@ nav {
 }
 
 .home-posts {
-  padding-top: 12px;
+  padding-top: 4px;
 
   h2 {
     margin-bottom: 6px;
@@ -316,18 +317,18 @@ nav {
 
   .posts-intro {
     margin-top: 0;
-    margin-bottom: 22px;
+    margin-bottom: 10px;
     color: #aeb3ba;
   }
 
   .posts {
     display: grid;
-    gap: 18px;
+    gap: 10px;
   }
 }
 
 .post-card {
-  padding: 18px 20px;
+  padding: 10px 12px;
   border: 1px solid #3a3f46;
   border-radius: 10px;
   background: #25272b;
@@ -338,8 +339,8 @@ nav {
   }
 
   .date {
-    margin: 0 0 10px 0;
-    font-size: 14px;
+    margin: 0 0 6px 0;
+    font-size: 12px;
     color: #a1a5ab;
   }
 
@@ -364,13 +365,13 @@ nav {
 
   .read-more {
     text-transform: uppercase;
-    font-size: 15px;
+    font-size: 12px;
     letter-spacing: 0.08em;
   }
 }
 
 .wrapper-footer {
-  margin-top: 50px;
+  margin-top: 20px;
   border-top: 1px solid #32353a;
   border-bottom: 1px solid #32353a;
   background-color: #202124;
