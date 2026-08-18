@@ -18,9 +18,9 @@ html {
 }
 
 body {
-	background: $white;
+	background: radial-gradient(circle at top, #141a1f 0%, #0a0d10 60%, #06080a 100%);
   font: 18px/1.4 $bodyFont;
-  color: $darkGray;
+  color: #c9f5cb;
 }
 
 .container {
@@ -32,7 +32,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: $headingFont;
-  color: $darkerGray;
+  color: #86efac;
   font-weight: bold;
 
   line-height: 1.7;
@@ -69,11 +69,11 @@ p {
 }
 
 a {
-  color: $blue;
+  color: #7ee787;
   text-decoration: none;
 	cursor: pointer;
   &:hover, &:active {
-    color: $blue;
+    color: #58a6ff;
   }
 }
 
@@ -117,7 +117,7 @@ img {
 
 .date {
   font-style: italic;
-  color: $gray;
+  color: #8b949e;
 }
 
 // Specify the color of the selection
@@ -156,7 +156,7 @@ img {
 
 .masthead {
   padding: 20px 0;
-  border-bottom: 1px solid $lightGray;
+  border-bottom: 1px solid #1f3b2b;
 
   @include mobile {
     text-align: center;
@@ -192,7 +192,7 @@ img {
 
 .site-name {
   margin: 0;
-  color: $darkGray;
+  color: #9ff7b2;
   cursor: pointer;
   font-family: $headingFont;
   font-weight: 300;
@@ -202,7 +202,7 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: $gray;
+  color: #8fb79b;
   font-size: 16px;
 
   @include mobile {
@@ -225,14 +225,14 @@ nav {
 
   a {
     margin-left: 20px;
-    color: $darkGray;
+    color: #c9f5cb;
     text-align: right;
-    font-weight: 300;
+    font-weight: 600;
     letter-spacing: 1px;
 
     @include mobile {
       margin: 0 10px;
-      color: $blue;
+      color: #7ee787;
     }
   }
 }
@@ -243,7 +243,7 @@ nav {
 
 .posts > .post {
   padding-bottom: 2em;
-  border-bottom: 1px solid $lightGray;
+  border-bottom: 1px solid #203629;
 }
 
 .posts > .post:last-child {
@@ -254,15 +254,15 @@ nav {
 .home-about {
   margin-bottom: 40px;
   padding: 22px;
-  border: 1px solid $lightGray;
+  border: 1px solid #2f5f43;
   border-radius: 10px;
-  background: #fafafa;
+  background: #0e1317;
 }
 
 .home-social {
   margin-bottom: 34px;
   padding: 16px 20px;
-  border: 1px dashed $lightGray;
+  border: 1px dashed #2f5f43;
   border-radius: 10px;
   text-align: center;
 
@@ -272,7 +272,7 @@ nav {
 
   .posts-intro {
     margin: 0 0 8px 0;
-    color: $gray;
+    color: #8fb79b;
   }
 
   .social-links {
@@ -300,7 +300,7 @@ nav {
   .posts-intro {
     margin-top: 0;
     margin-bottom: 22px;
-    color: $gray;
+    color: #8fb79b;
   }
 
   .posts {
@@ -311,9 +311,9 @@ nav {
 
 .post-card {
   padding: 18px 20px;
-  border: 1px solid $lightGray;
+  border: 1px solid #2a4a37;
   border-radius: 10px;
-  background: $white;
+  background: #0d1216;
 
   .post-card-title {
     margin: 0 0 2px 0;
@@ -323,7 +323,7 @@ nav {
   .date {
     margin: 0 0 10px 0;
     font-size: 14px;
-    color: $gray;
+    color: #8b949e;
   }
 
   .entry p {
@@ -334,9 +334,9 @@ nav {
 .post {
   blockquote {
     margin: 1.8em .8em;
-    border-left: 2px solid $gray;
+    border-left: 2px solid #3b7a57;
     padding: 0.1em 1em;
-    color: $gray;
+    color: #9ec8ab;
     font-size: 22px;
     font-style: italic;
   }
@@ -348,14 +348,15 @@ nav {
   .read-more {
     text-transform: uppercase;
     font-size: 15px;
+    letter-spacing: 0.08em;
   }
 }
 
 .wrapper-footer {
   margin-top: 50px;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  background-color: $lightGray;
+  border-top: 1px solid #1f3b2b;
+  border-bottom: 1px solid #1f3b2b;
+  background-color: #0a0f12;
 }
 
 footer {
