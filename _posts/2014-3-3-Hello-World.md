@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Hello from patelnix
+title: Hello!! Visitors
 ---
 
 This is the first post on my new personal site.
