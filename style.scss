@@ -18,9 +18,9 @@ html {
 }
 
 body {
-	background: radial-gradient(circle at top, #141a1f 0%, #0a0d10 60%, #06080a 100%);
+	background: #2f3032;
   font: 18px/1.4 $bodyFont;
-  color: #c9f5cb;
+  color: #cfd1d4;
 }
 
 .container {
@@ -28,11 +28,12 @@ body {
   max-width: 740px;
   padding: 0 10px;
   width: 100%;
+  background: #202124;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: $headingFont;
-  color: #86efac;
+  color: #e6e8eb;
   font-weight: bold;
 
   line-height: 1.7;
@@ -69,11 +70,11 @@ p {
 }
 
 a {
-  color: #7ee787;
+  color: #46b7ff;
   text-decoration: none;
 	cursor: pointer;
   &:hover, &:active {
-    color: #58a6ff;
+    color: #86d0ff;
   }
 }
 
@@ -117,7 +118,7 @@ img {
 
 .date {
   font-style: italic;
-  color: #8b949e;
+  color: #a1a5ab;
 }
 
 // Specify the color of the selection
@@ -155,24 +156,26 @@ img {
 }
 
 .masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
   padding: 20px 0;
-  border-bottom: 1px solid #1f3b2b;
+  border-bottom: 1px solid #32353a;
 
   @include mobile {
     text-align: center;
+    display: block;
   }
 }
 
 .site-avatar {
-  float: left;
   width: 70px;
   height: 70px;
-  margin-right: 15px;
+  flex: 0 0 auto;
 
   @include mobile {
-    float: none;
-    display: block;
-    margin: 0 auto;
+    margin: 0;
   }
 
   img {
@@ -181,18 +184,27 @@ img {
 }
 
 .site-info {
-  float: left;
+  flex: 1;
+
+  .site-header-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
 
   @include mobile {
-    float: none;
     display: block;
     margin: 0 auto;
+
+    .site-header-main {
+      justify-content: center;
+    }
   }
 }
 
 .site-name {
   margin: 0;
-  color: #9ff7b2;
+  color: #e6e8eb;
   cursor: pointer;
   font-family: $headingFont;
   font-weight: 300;
@@ -202,7 +214,7 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: #8fb79b;
+  color: #aeb3ba;
   font-size: 16px;
 
   @include mobile {
@@ -211,28 +223,26 @@ img {
 }
 
 nav {
-  float: right;
-  margin-top: 23px; // @TODO: Vertically middle align
+  margin-top: 0;
   font-family: $bodyFont;
   font-size: 18px;
 
   @include mobile {
-    float: none;
-    margin-top: 9px;
+    margin-top: 12px;
     display: block;
     font-size: 16px;
   }
 
   a {
     margin-left: 20px;
-    color: #c9f5cb;
+    color: #b7bcc3;
     text-align: right;
     font-weight: 600;
     letter-spacing: 1px;
 
     @include mobile {
       margin: 0 10px;
-      color: #7ee787;
+      color: #46b7ff;
     }
   }
 }
@@ -243,7 +253,7 @@ nav {
 
 .posts > .post {
   padding-bottom: 2em;
-  border-bottom: 1px solid #203629;
+  border-bottom: 1px solid #32353a;
 }
 
 .posts > .post:last-child {
@@ -254,15 +264,15 @@ nav {
 .home-about {
   margin-bottom: 40px;
   padding: 22px;
-  border: 1px solid #2f5f43;
+  border: 1px solid #363a3f;
   border-radius: 10px;
-  background: #0e1317;
+  background: #25272b;
 }
 
 .home-social {
   margin-bottom: 34px;
   padding: 16px 20px;
-  border: 1px dashed #2f5f43;
+  border: 1px dashed #40444a;
   border-radius: 10px;
   text-align: center;
 
@@ -272,7 +282,7 @@ nav {
 
   .posts-intro {
     margin: 0 0 8px 0;
-    color: #8fb79b;
+    color: #aeb3ba;
   }
 
   .social-links {
@@ -300,7 +310,7 @@ nav {
   .posts-intro {
     margin-top: 0;
     margin-bottom: 22px;
-    color: #8fb79b;
+    color: #aeb3ba;
   }
 
   .posts {
@@ -311,9 +321,9 @@ nav {
 
 .post-card {
   padding: 18px 20px;
-  border: 1px solid #2a4a37;
+  border: 1px solid #3a3f46;
   border-radius: 10px;
-  background: #0d1216;
+  background: #25272b;
 
   .post-card-title {
     margin: 0 0 2px 0;
@@ -323,7 +333,7 @@ nav {
   .date {
     margin: 0 0 10px 0;
     font-size: 14px;
-    color: #8b949e;
+    color: #a1a5ab;
   }
 
   .entry p {
@@ -334,9 +344,9 @@ nav {
 .post {
   blockquote {
     margin: 1.8em .8em;
-    border-left: 2px solid #3b7a57;
+    border-left: 2px solid #46b7ff;
     padding: 0.1em 1em;
-    color: #9ec8ab;
+    color: #c8d3dd;
     font-size: 22px;
     font-style: italic;
   }
@@ -354,9 +364,9 @@ nav {
 
 .wrapper-footer {
   margin-top: 50px;
-  border-top: 1px solid #1f3b2b;
-  border-bottom: 1px solid #1f3b2b;
-  background-color: #0a0f12;
+  border-top: 1px solid #32353a;
+  border-bottom: 1px solid #32353a;
+  background-color: #202124;
 }
 
 footer {
