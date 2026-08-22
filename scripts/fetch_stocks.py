@@ -4,13 +4,20 @@ Fetch fundamental data for S&P 500 stocks via yfinance.
 Outputs stocks-data.json to the repo root.
 
 Field conventions stored in JSON:
-  roe      - return on equity as a percentage (e.g. 15.5 means 15.5%)
-  de       - debt-to-equity as a ratio       (e.g. 0.5  means 0.5x)
-  pe       - trailing P/E ratio
-  pb       - price-to-book ratio
-  peg      - PEG ratio
-  fcfYield - free cash flow yield as a percentage
-  marketCap - raw value in USD
+  roe        - return on equity        as a percentage (e.g. 15.5 = 15.5%)
+  de         - debt-to-equity          as a ratio      (e.g. 0.5  = 0.5x)
+  margin     - net profit margin       as a percentage
+  opMargin   - operating margin        as a percentage
+  epsGrowth  - trailing EPS growth     as a percentage
+  roa        - return on assets        as a percentage
+  pe         - trailing P/E ratio
+  pb         - price-to-book ratio
+  peg        - PEG ratio
+  fcfYield   - free cash flow yield    as a percentage
+  ev         - enterprise value        raw USD
+  ebitda     - EBITDA                  raw USD
+  currentRatio - current ratio         raw ratio
+  marketCap  - market capitalisation   raw USD
 """
 
 import json
@@ -23,6 +30,11 @@ from io import StringIO
 import requests
 import pandas as pd
 import yfinance as yf
+
+
+def _pct(val):
+    """Convert a yfinance decimal ratio to a rounded percentage, or None if absent."""
+    return round(float(val) * 100, 2) if val is not None else None
 
 
 def get_sp500_tickers():
@@ -78,10 +90,17 @@ def fetch_stock(ticker):
             "marketCap": market_cap,
             "pe":        round(float(info.get("trailingPE") or 0), 2),
             "pb":        round(float(info.get("priceToBook") or 0), 2),
-            "roe":       roe,
-            "de":        de,
-            "peg":       round(float(info.get("pegRatio") or 0), 2),
-            "fcfYield":  fcf_yield,
+            "roe":         roe,
+            "de":          de,
+            "peg":         round(float(info.get("pegRatio") or 0), 2),
+            "fcfYield":    fcf_yield,
+            "margin":      _pct(info.get("profitMargins")),
+            "opMargin":    _pct(info.get("operatingMargins")),
+            "epsGrowth":   _pct(info.get("earningsGrowth")),
+            "roa":         _pct(info.get("returnOnAssets")),
+            "ev":          info.get("enterpriseValue") or 0,
+            "ebitda":      info.get("ebitda") or 0,
+            "currentRatio": round(float(info.get("currentRatio") or 0), 2) or None,
         }
 
     except Exception as exc:

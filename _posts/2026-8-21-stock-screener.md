@@ -9,12 +9,12 @@ The idea: pull fundamentals for a broad universe of stocks, run them through a f
 
 The strategies I plan to implement:
 
-- **Buffett** — ROE above 15%, low price-to-book, conservative debt, durable earnings
-- **Greenblatt (Magic Formula)** — rank by earnings yield and return on invested capital
-- **Pabrai** — low P/E, clean balance sheet, high free cash flow, detectable moat
-- **Peter Lynch (PEG)** — PEG ratio below 1, growth priced cheaply
+- **Buffett** — ROE above 15%, net profit margin above 15%, conservative debt, positive FCF
+- **Greenblatt (Magic Formula)** — earnings yield (EBITDA / enterprise value) + return on invested capital
+- **Pabrai** — low P/E, minimal debt, high FCF yield, capital-efficient (ROE > 15%), healthy balance sheet
+- **Peter Lynch (GARP)** — PEG below 1, earnings growth above 10%, P/E below 40
 
-Data comes from [Financial Modeling Prep](https://financialmodelingprep.com), which has a generous free tier. Everything runs client-side — no server, no backend, no data stored anywhere.
+Data comes from Yahoo Finance via the open-source [yfinance](https://github.com/ranaroussi/yfinance) library, refreshed weekly by a GitHub Action. Everything runs client-side — no server, no backend, no API keys.
 
 The page is live now. It is mostly scaffolding until the API key is wired in, but the strategy logic is already written.
 

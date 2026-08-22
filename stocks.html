@@ -154,7 +154,7 @@ title: Stock Screener
 
 <div class="screener-header">
   <h1>Stock Screener</h1>
-  <p>Filter stocks by classic value investing strategies. Data via <a href="https://financialmodelingprep.com" target="_blank" rel="noopener">Financial Modeling Prep</a>.</p>
+  <p>Filter stocks by classic value investing strategies. Data from Yahoo Finance via <a href="https://github.com/ranaroussi/yfinance" target="_blank" rel="noopener">yfinance</a>, refreshed weekly.</p>
 </div>
 
 <div class="strategy-filters">
@@ -169,16 +169,20 @@ title: Stock Screener
   Showing all screened stocks with no additional strategy filter applied.
 </div>
 <div id="strategy-desc-buffett" class="strategy-desc">
-  <strong>Buffett:</strong> ROE &gt; 15%, P/B &lt; 1.5, debt-to-equity &lt; 0.5, consistent earnings growth. Focus on durable competitive advantages at a fair price.
+  <strong>Buffett:</strong> ROE &gt; 15%, net profit margin &gt; 15%, D/E &lt; 0.5, P/E &lt; 25, FCF yield &gt; 3%.
+  Quality businesses with durable competitive advantages, bought at a fair (not necessarily cheap) price.
 </div>
 <div id="strategy-desc-greenblatt" class="strategy-desc">
-  <strong>Greenblatt (Magic Formula):</strong> Ranks stocks by earnings yield (EBIT / enterprise value) and return on invested capital (ROIC). Top combined rank = candidates.
+  <strong>Greenblatt (Magic Formula):</strong> Scores by earnings yield (EBITDA / enterprise value) and return on invested capital (ROE as proxy).
+  High scores on both = cheap and efficient business — the Magic Formula sweet spot.
 </div>
 <div id="strategy-desc-pabrai" class="strategy-desc">
-  <strong>Pabrai:</strong> Low P/E, low debt, high free cash flow yield, and a detectable moat. Inspired by Buffett, focused on heads-I-win tails-I-don't-lose bets.
+  <strong>Pabrai (Dhandho):</strong> P/E &lt; 15, D/E &lt; 0.3, FCF yield &gt; 5%, ROE &gt; 15%, current ratio &gt; 1.5.
+  Heads-I-win, tails-I-don't-lose bets: cheap price, minimal debt, strong cash generation, healthy balance sheet.
 </div>
 <div id="strategy-desc-lynch" class="strategy-desc">
-  <strong>Peter Lynch (PEG):</strong> PEG ratio &lt; 1. A stock growing earnings faster than its P/E ratio suggests undervaluation. Works well for growth-at-reasonable-price screening.
+  <strong>Peter Lynch (GARP):</strong> PEG &lt; 1, EPS growth &gt; 10%, P/E &lt; 40.
+  Growth at a reasonable price — stocks growing earnings faster than their valuation implies, without speculative multiples.
 </div>
 
 <div id="loading-indicator">Loading market data…</div>
@@ -240,37 +244,61 @@ title: Stock Screener
   });
 
   // ─── Strategy scoring functions ───────────────────────────────────────────
+  // Scores are 0–100. Filter threshold is >= 50.
+
   function scoreBuffett(s) {
+    // Quality business at a fair price: ROE, margins, low debt, reasonable PE, FCF
     let score = 0;
-    if (s.roe > 15)     score += 30;
-    if (s.pb < 1.5)     score += 25;
-    if (s.de < 0.5)     score += 25;
-    if (s.pe > 0 && s.pe < 20) score += 20;
+    if (s.roe    != null && s.roe    >  15) score += 25;  // strong returns on equity
+    if (s.margin != null && s.margin >  15) score += 25;  // wide net profit margin
+    if (s.de     != null && s.de     < 0.5) score += 20;  // conservative balance sheet
+    if (s.pe > 0 && s.pe < 25)             score += 15;  // fair price (not Graham-cheap)
+    if (s.fcfYield > 3)                    score += 15;  // real cash generation
     return score;
   }
 
   function scoreGreenblatt(s) {
-    // earnings yield = 1/PE as a proxy; ROIC proxied by ROE
-    let score = 0;
-    if (s.pe > 0) score += Math.min(40, Math.round((1 / s.pe) * 400));
-    if (s.roe > 0) score += Math.min(60, Math.round(s.roe * 0.8));
-    return score;
+    // Magic Formula: earnings yield (EBITDA/EV) + ROIC proxy (ROE), each 0–50 pts
+    let eyScore = 0;
+    if (s.ebitda > 0 && s.ev > 0) {
+      const ey = (s.ebitda / s.ev) * 100;                       // earnings yield %
+      eyScore = Math.min(50, Math.round((ey / 15) * 50));        // 15%+ EY → full 50 pts
+    } else if (s.pe > 0) {
+      const ey = (1 / s.pe) * 100;                              // fallback via PE
+      eyScore = Math.min(50, Math.round((ey / 15) * 50));
+    }
+    let roicScore = 0;
+    if (s.roe != null && s.roe > 0) {
+      roicScore = Math.min(50, Math.round((s.roe / 30) * 50));   // 30%+ ROE → full 50 pts
+    }
+    return Math.min(100, eyScore + roicScore);
   }
 
   function scorePabrai(s) {
+    // Dhandho: cheap price, minimal debt, cash machine, capital-efficient, healthy balance sheet
     let score = 0;
-    if (s.pe > 0 && s.pe < 15) score += 30;
-    if (s.de < 0.3)             score += 30;
-    if (s.fcfYield > 5)         score += 40;
+    if (s.pe > 0 && s.pe < 15)                          score += 20;
+    if (s.de           != null && s.de    < 0.3)         score += 20;
+    if (s.fcfYield > 5)                                  score += 25;
+    if (s.roe          != null && s.roe   > 15)          score += 20;
+    if (s.currentRatio != null && s.currentRatio > 1.5)  score += 15;
     return score;
   }
 
   function scoreLynch(s) {
-    // PEG = PE / earnings growth rate; PEG < 1 is ideal
-    if (!s.peg || s.peg <= 0) return 0;
-    if (s.peg < 1)  return 100;
-    if (s.peg < 1.5) return 60;
-    return 20;
+    // GARP: PEG < 1 as core, meaningful earnings growth, avoid speculative PE
+    let score = 0;
+    if (s.peg > 0) {
+      if      (s.peg < 1.0) score += 50;
+      else if (s.peg < 1.5) score += 30;
+      else if (s.peg < 2.0) score += 10;
+    }
+    if (s.epsGrowth != null) {
+      if      (s.epsGrowth > 10) score += 25;
+      else if (s.epsGrowth >  5) score += 10;
+    }
+    if (s.pe > 0 && s.pe < 40) score += 25;  // avoid speculative multiples
+    return Math.min(100, score);
   }
 
   const scorers = { buffett: scoreBuffett, greenblatt: scoreGreenblatt, pabrai: scorePabrai, lynch: scoreLynch };
@@ -329,17 +357,24 @@ title: Stock Screener
       }
 
       allStocks = data.stocks.map(d => ({
-        ticker:    d.ticker    || '',
-        name:      d.name      || '',
-        sector:    d.sector    || '',
-        price:     d.price     || 0,
-        marketCap: d.marketCap || 0,
-        pe:        d.pe        || 0,
-        pb:        d.pb        || 0,
-        roe:       d.roe       != null ? d.roe  : null,
-        de:        d.de        != null ? d.de   : null,
-        fcfYield:  d.fcfYield  || 0,
-        peg:       d.peg       || 0,
+        ticker:       d.ticker       || '',
+        name:         d.name         || '',
+        sector:       d.sector       || '',
+        price:        d.price        || 0,
+        marketCap:    d.marketCap    || 0,
+        pe:           d.pe           || 0,
+        pb:           d.pb           || 0,
+        roe:          d.roe          != null ? d.roe          : null,
+        de:           d.de           != null ? d.de           : null,
+        fcfYield:     d.fcfYield     || 0,
+        peg:          d.peg          || 0,
+        margin:       d.margin       != null ? d.margin       : null,
+        opMargin:     d.opMargin     != null ? d.opMargin     : null,
+        epsGrowth:    d.epsGrowth    != null ? d.epsGrowth    : null,
+        roa:          d.roa          != null ? d.roa          : null,
+        ev:           d.ev           || 0,
+        ebitda:       d.ebitda       || 0,
+        currentRatio: d.currentRatio != null ? d.currentRatio : null,
       }));
 
       const updated = data.generated
