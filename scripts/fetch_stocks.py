@@ -18,6 +18,9 @@ import time
 import datetime
 import sys
 
+from io import StringIO
+
+import requests
 import pandas as pd
 import yfinance as yf
 
@@ -25,7 +28,11 @@ import yfinance as yf
 def get_sp500_tickers():
     """Fetch current S&P 500 ticker list from Wikipedia."""
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    df = pd.read_html(url)[0]
+    # urllib's default User-Agent is blocked by Wikipedia (403); use requests instead
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; stock-screener/1.0; +https://patelnix.github.io)"}
+    resp = requests.get(url, headers=headers, timeout=15)
+    resp.raise_for_status()
+    df = pd.read_html(StringIO(resp.text))[0]
     # Yahoo Finance uses hyphens where tickers have dots (e.g. BRK.B -> BRK-B)
     return [t.replace(".", "-") for t in df["Symbol"].tolist()]
 
