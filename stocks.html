@@ -150,6 +150,27 @@ title: Stock Screener
   #results-count strong {
     color: #e6e8eb;
   }
+
+  .view-all-wrap {
+    text-align: center;
+    padding: 18px 0 6px;
+  }
+
+  .view-all-btn {
+    background: transparent;
+    border: 1px solid #505254;
+    color: #9a9d9f;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 7px 22px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .view-all-btn:hover {
+    border-color: #46b7ff;
+    color: #46b7ff;
+  }
 </style>
 
 <div class="screener-header">
@@ -213,6 +234,7 @@ title: Stock Screener
       </tbody>
     </table>
   </div>
+  <div id="view-all-wrap" class="view-all-wrap"></div>
 </div>
 
 <div class="screener-notice" id="screener-notice">
@@ -225,6 +247,7 @@ title: Stock Screener
   // ─── Strategy filter state ────────────────────────────────────────────────
   let currentStrategy = 'all';
   let allStocks = [];
+  let showAll = false;
 
   // ─── Strategy descriptions ────────────────────────────────────────────────
   const strategyDescs = document.querySelectorAll('.strategy-desc');
@@ -234,6 +257,7 @@ title: Stock Screener
       document.querySelectorAll('.strategy-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentStrategy = btn.dataset.strategy;
+      showAll = false;
 
       strategyDescs.forEach(d => d.classList.remove('visible'));
       const desc = document.getElementById('strategy-desc-' + currentStrategy);
@@ -313,18 +337,28 @@ title: Stock Screener
   }
 
   // ─── Table rendering ──────────────────────────────────────────────────────
+  const PAGE_SIZE = 25;
+
   function renderTable(stocks) {
-    const tbody = document.getElementById('stock-table-body');
-    const countEl = document.getElementById('results-count');
+    const tbody       = document.getElementById('stock-table-body');
+    const countEl     = document.getElementById('results-count');
+    const viewAllWrap = document.getElementById('view-all-wrap');
 
     if (!stocks.length) {
       tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:#9a9d9f;">No stocks match this filter.</td></tr>';
       countEl.innerHTML = '';
+      viewAllWrap.innerHTML = '';
       return;
     }
 
-    countEl.innerHTML = 'Showing <strong>' + stocks.length + '</strong> stocks';
-    tbody.innerHTML = stocks.map(s => {
+    const visible   = showAll ? stocks : stocks.slice(0, PAGE_SIZE);
+    const remaining = stocks.length - visible.length;
+
+    countEl.innerHTML = remaining > 0
+      ? 'Showing <strong>' + visible.length + '</strong> of <strong>' + stocks.length + '</strong> stocks'
+      : 'Showing <strong>' + stocks.length + '</strong> stocks';
+
+    tbody.innerHTML = visible.map(s => {
       const score = currentStrategy !== 'all' ? s.strategyScore : '—';
       const scoreClass = score >= 80 ? 'positive' : score >= 50 ? '' : 'negative';
       return `<tr>
@@ -339,6 +373,16 @@ title: Stock Screener
         <td class="${scoreClass}">${score}</td>
       </tr>`;
     }).join('');
+
+    if (remaining > 0) {
+      viewAllWrap.innerHTML = `<button class="view-all-btn">View all ${stocks.length} stocks</button>`;
+      viewAllWrap.querySelector('button').addEventListener('click', () => {
+        showAll = true;
+        renderTable(stocks);
+      });
+    } else {
+      viewAllWrap.innerHTML = '';
+    }
   }
 
   // ─── Load pre-computed JSON ───────────────────────────────────────────────
