@@ -1,0 +1,362 @@
+---
+layout: default
+title: Stock Screener
+---
+
+<style>
+  .screener-header {
+    margin-bottom: 28px;
+  }
+
+  .screener-header p {
+    color: #9a9d9f;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  .strategy-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .strategy-btn {
+    background: #3a3c3e;
+    border: 1px solid #505254;
+    color: #cfd1d4;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .strategy-btn:hover {
+    background: #46474a;
+    border-color: #46b7ff;
+    color: #e6e8eb;
+  }
+
+  .strategy-btn.active {
+    background: #1a3a50;
+    border-color: #46b7ff;
+    color: #46b7ff;
+  }
+
+  .screener-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #9a9d9f;
+  }
+
+  .screener-status {
+    font-size: 13px;
+    color: #9a9d9f;
+  }
+
+  .screener-status span {
+    color: #46b7ff;
+  }
+
+  .stock-table-wrap {
+    overflow-x: auto;
+  }
+
+  .stock-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .stock-table thead th {
+    text-align: left;
+    padding: 8px 12px;
+    background: #3a3c3e;
+    color: #9a9d9f;
+    font-weight: 500;
+    border-bottom: 1px solid #505254;
+    white-space: nowrap;
+  }
+
+  .stock-table tbody tr {
+    border-bottom: 1px solid #3a3c3e;
+    transition: background 0.1s;
+  }
+
+  .stock-table tbody tr:hover {
+    background: #363839;
+  }
+
+  .stock-table tbody td {
+    padding: 9px 12px;
+    color: #cfd1d4;
+    white-space: nowrap;
+  }
+
+  .stock-table td.ticker {
+    color: #46b7ff;
+    font-weight: 600;
+  }
+
+  .stock-table td.positive { color: #5cb85c; }
+  .stock-table td.negative { color: #d9534f; }
+
+  .screener-notice {
+    background: #1e2528;
+    border: 1px solid #2e4a5a;
+    color: #9a9d9f;
+    font-size: 13px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    line-height: 1.6;
+  }
+
+  .screener-notice a {
+    color: #46b7ff;
+  }
+
+  .strategy-desc {
+    background: #353738;
+    border-left: 3px solid #46b7ff;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #9a9d9f;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .strategy-desc.visible {
+    display: block;
+  }
+
+  #loading-indicator {
+    text-align: center;
+    padding: 40px 0;
+    color: #9a9d9f;
+    font-size: 13px;
+    display: none;
+  }
+
+  #results-count {
+    font-size: 13px;
+    color: #9a9d9f;
+  }
+
+  #results-count strong {
+    color: #e6e8eb;
+  }
+</style>
+
+<div class="screener-header">
+  <h1>Stock Screener</h1>
+  <p>Filter stocks by classic value investing strategies. Data via <a href="https://financialmodelingprep.com" target="_blank" rel="noopener">Financial Modeling Prep</a>.</p>
+</div>
+
+<div class="strategy-filters">
+  <button class="strategy-btn active" data-strategy="all">All</button>
+  <button class="strategy-btn" data-strategy="buffett">Buffett</button>
+  <button class="strategy-btn" data-strategy="greenblatt">Greenblatt</button>
+  <button class="strategy-btn" data-strategy="pabrai">Pabrai</button>
+  <button class="strategy-btn" data-strategy="lynch">Peter Lynch</button>
+</div>
+
+<div id="strategy-desc-all" class="strategy-desc visible">
+  Showing all screened stocks with no additional strategy filter applied.
+</div>
+<div id="strategy-desc-buffett" class="strategy-desc">
+  <strong>Buffett:</strong> ROE &gt; 15%, P/B &lt; 1.5, debt-to-equity &lt; 0.5, consistent earnings growth. Focus on durable competitive advantages at a fair price.
+</div>
+<div id="strategy-desc-greenblatt" class="strategy-desc">
+  <strong>Greenblatt (Magic Formula):</strong> Ranks stocks by earnings yield (EBIT / enterprise value) and return on invested capital (ROIC). Top combined rank = candidates.
+</div>
+<div id="strategy-desc-pabrai" class="strategy-desc">
+  <strong>Pabrai:</strong> Low P/E, low debt, high free cash flow yield, and a detectable moat. Inspired by Buffett, focused on heads-I-win tails-I-don't-lose bets.
+</div>
+<div id="strategy-desc-lynch" class="strategy-desc">
+  <strong>Peter Lynch (PEG):</strong> PEG ratio &lt; 1. A stock growing earnings faster than its P/E ratio suggests undervaluation. Works well for growth-at-reasonable-price screening.
+</div>
+
+<div id="loading-indicator">Loading market data…</div>
+
+<div id="screener-results">
+  <div class="screener-meta">
+    <span id="results-count"></span>
+    <span class="screener-status">Status: <span id="api-status">not configured</span></span>
+  </div>
+
+  <div class="stock-table-wrap">
+    <table class="stock-table">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Company</th>
+          <th>Sector</th>
+          <th>Price</th>
+          <th>P/E</th>
+          <th>P/B</th>
+          <th>ROE %</th>
+          <th>D/E</th>
+          <th>Strategy Score</th>
+        </tr>
+      </thead>
+      <tbody id="stock-table-body">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="screener-notice" id="screener-notice">
+  <strong>Setup required:</strong> This screener needs a free API key from
+  <a href="https://financialmodelingprep.com/developer/docs/" target="_blank" rel="noopener">Financial Modeling Prep</a>
+  to pull live data. Once configured, this table will populate automatically.
+  See the <a href="/blog/">related post</a> for context.
+</div>
+
+<script>
+  // ─── Configuration ────────────────────────────────────────────────────────
+  const FMP_API_KEY = '';  // set your FMP key here
+  const FMP_BASE    = 'https://financialmodelingprep.com/api/v3';
+
+  // ─── Strategy filter state ────────────────────────────────────────────────
+  let currentStrategy = 'all';
+  let allStocks = [];
+
+  // ─── Strategy descriptions ────────────────────────────────────────────────
+  const strategyDescs = document.querySelectorAll('.strategy-desc');
+
+  document.querySelectorAll('.strategy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.strategy-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentStrategy = btn.dataset.strategy;
+
+      strategyDescs.forEach(d => d.classList.remove('visible'));
+      const desc = document.getElementById('strategy-desc-' + currentStrategy);
+      if (desc) desc.classList.add('visible');
+
+      renderTable(filterStocks(allStocks, currentStrategy));
+    });
+  });
+
+  // ─── Strategy scoring functions ───────────────────────────────────────────
+  function scoreBuffett(s) {
+    let score = 0;
+    if (s.roe > 15)     score += 30;
+    if (s.pb < 1.5)     score += 25;
+    if (s.de < 0.5)     score += 25;
+    if (s.pe > 0 && s.pe < 20) score += 20;
+    return score;
+  }
+
+  function scoreGreenblatt(s) {
+    // earnings yield = 1/PE as a proxy; ROIC proxied by ROE
+    let score = 0;
+    if (s.pe > 0) score += Math.min(40, Math.round((1 / s.pe) * 400));
+    if (s.roe > 0) score += Math.min(60, Math.round(s.roe * 0.8));
+    return score;
+  }
+
+  function scorePabrai(s) {
+    let score = 0;
+    if (s.pe > 0 && s.pe < 15) score += 30;
+    if (s.de < 0.3)             score += 30;
+    if (s.fcfYield > 5)         score += 40;
+    return score;
+  }
+
+  function scoreLynch(s) {
+    // PEG = PE / earnings growth rate; PEG < 1 is ideal
+    if (!s.peg || s.peg <= 0) return 0;
+    if (s.peg < 1)  return 100;
+    if (s.peg < 1.5) return 60;
+    return 20;
+  }
+
+  const scorers = { buffett: scoreBuffett, greenblatt: scoreGreenblatt, pabrai: scorePabrai, lynch: scoreLynch };
+
+  function filterStocks(stocks, strategy) {
+    if (strategy === 'all') return stocks;
+    const scorer = scorers[strategy];
+    return stocks
+      .map(s => ({ ...s, strategyScore: scorer(s) }))
+      .filter(s => s.strategyScore >= 50)
+      .sort((a, b) => b.strategyScore - a.strategyScore);
+  }
+
+  // ─── Table rendering ──────────────────────────────────────────────────────
+  function renderTable(stocks) {
+    const tbody = document.getElementById('stock-table-body');
+    const countEl = document.getElementById('results-count');
+
+    if (!stocks.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:#9a9d9f;">No stocks match this filter.</td></tr>';
+      countEl.innerHTML = '';
+      return;
+    }
+
+    countEl.innerHTML = 'Showing <strong>' + stocks.length + '</strong> stocks';
+    tbody.innerHTML = stocks.map(s => {
+      const score = currentStrategy !== 'all' ? s.strategyScore : '—';
+      const scoreClass = score >= 80 ? 'positive' : score >= 50 ? '' : 'negative';
+      return `<tr>
+        <td class="ticker">${s.ticker}</td>
+        <td>${s.name}</td>
+        <td>${s.sector}</td>
+        <td>$${s.price.toFixed(2)}</td>
+        <td>${s.pe > 0 ? s.pe.toFixed(1) : '—'}</td>
+        <td>${s.pb > 0 ? s.pb.toFixed(2) : '—'}</td>
+        <td class="${s.roe > 15 ? 'positive' : ''}">${s.roe.toFixed(1)}</td>
+        <td class="${s.de < 0.5 ? 'positive' : 'negative'}">${s.de.toFixed(2)}</td>
+        <td class="${scoreClass}">${score}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ─── API fetch (runs only when key is set) ────────────────────────────────
+  async function loadScreener() {
+    if (!FMP_API_KEY) return;
+
+    document.getElementById('screener-notice').style.display = 'none';
+    document.getElementById('loading-indicator').style.display = 'block';
+    document.getElementById('api-status').textContent = 'loading…';
+
+    try {
+      // Pull a screened list: market cap > 1B, US exchange
+      const url = `${FMP_BASE}/stock-screener?marketCapMoreThan=1000000000&exchange=NYSE,NASDAQ&limit=200&apikey=${FMP_API_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('API error ' + res.status);
+      const data = await res.json();
+
+      allStocks = data.map(d => ({
+        ticker:   d.symbol      || '',
+        name:     d.companyName || '',
+        sector:   d.sector      || '',
+        price:    d.price       || 0,
+        pe:       d.pe          || 0,
+        pb:       0,   // fetched in enrichment pass
+        roe:      0,
+        de:       0,
+        fcfYield: 0,
+        peg:      0,
+      }));
+
+      document.getElementById('api-status').textContent = 'live';
+      document.getElementById('loading-indicator').style.display = 'none';
+      renderTable(filterStocks(allStocks, currentStrategy));
+
+    } catch (err) {
+      document.getElementById('api-status').textContent = 'error';
+      document.getElementById('loading-indicator').style.display = 'none';
+      document.getElementById('screener-notice').style.display = 'block';
+      document.getElementById('screener-notice').textContent = 'Failed to load data: ' + err.message;
+    }
+  }
+
+  loadScreener();
+</script>
