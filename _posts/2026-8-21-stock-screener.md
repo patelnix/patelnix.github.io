@@ -3,9 +3,9 @@ layout: post
 title: "Building a Value Investor Stock Screener"
 ---
 
-I have been thinking about a simple, opinionated stock screener — one that filters the market through the lens of investors I respect rather than arbitrary technical signals.
+I have been thinking about a simple, stock screener — one that filters the market through the lens of investors.
 
-The idea: pull fundamentals for a broad universe of stocks, run them through a few well-defined strategies, and surface candidates worth a closer look. Not a buy list. A starting point.
+The idea: pull fundamentals for s&p 500 stocks, run them through a few well-defined strategies, and surface candidates worth a closer look. Not a buy list. A starting point.
 
 The strategies I plan to implement:
 
