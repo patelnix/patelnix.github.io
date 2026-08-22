@@ -212,17 +212,12 @@ title: Stock Screener
 </div>
 
 <div class="screener-notice" id="screener-notice">
-  <strong>Setup required:</strong> This screener needs a free API key from
-  <a href="https://financialmodelingprep.com/developer/docs/" target="_blank" rel="noopener">Financial Modeling Prep</a>
-  to pull live data. Once configured, this table will populate automatically.
-  See the <a href="/blog/">related post</a> for context.
+  <strong>Data not loaded.</strong> Run <code>python scripts/fetch_stocks.py</code> locally, or trigger the
+  <a href="https://github.com/patelnix/patelnix.github.io/actions" target="_blank" rel="noopener">GitHub Action</a>
+  manually to generate <code>stocks-data.json</code>. The action also runs automatically every Monday.
 </div>
 
 <script>
-  // ─── Configuration ────────────────────────────────────────────────────────
-  const FMP_API_KEY = '';  // set your FMP key here
-  const FMP_BASE    = 'https://financialmodelingprep.com/api/v3';
-
   // ─── Strategy filter state ────────────────────────────────────────────────
   let currentStrategy = 'all';
   let allStocks = [];
@@ -311,50 +306,55 @@ title: Stock Screener
         <td>$${s.price.toFixed(2)}</td>
         <td>${s.pe > 0 ? s.pe.toFixed(1) : '—'}</td>
         <td>${s.pb > 0 ? s.pb.toFixed(2) : '—'}</td>
-        <td class="${s.roe > 15 ? 'positive' : ''}">${s.roe.toFixed(1)}</td>
-        <td class="${s.de < 0.5 ? 'positive' : 'negative'}">${s.de.toFixed(2)}</td>
+        <td class="${s.roe != null && s.roe > 15 ? 'positive' : ''}">${s.roe != null ? s.roe.toFixed(1) : '—'}</td>
+        <td class="${s.de != null ? (s.de < 0.5 ? 'positive' : 'negative') : ''}">${s.de != null ? s.de.toFixed(2) : '—'}</td>
         <td class="${scoreClass}">${score}</td>
       </tr>`;
     }).join('');
   }
 
-  // ─── API fetch (runs only when key is set) ────────────────────────────────
+  // ─── Load pre-computed JSON ───────────────────────────────────────────────
   async function loadScreener() {
-    if (!FMP_API_KEY) return;
-
     document.getElementById('screener-notice').style.display = 'none';
     document.getElementById('loading-indicator').style.display = 'block';
     document.getElementById('api-status').textContent = 'loading…';
 
     try {
-      // Pull a screened list: market cap > 1B, US exchange
-      const url = `${FMP_BASE}/stock-screener?marketCapMoreThan=1000000000&exchange=NYSE,NASDAQ&limit=200&apikey=${FMP_API_KEY}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('API error ' + res.status);
+      const res = await fetch('/stocks-data.json');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
 
-      allStocks = data.map(d => ({
-        ticker:   d.symbol      || '',
-        name:     d.companyName || '',
-        sector:   d.sector      || '',
-        price:    d.price       || 0,
-        pe:       d.pe          || 0,
-        pb:       0,   // fetched in enrichment pass
-        roe:      0,
-        de:       0,
-        fcfYield: 0,
-        peg:      0,
+      if (!data.stocks || !data.stocks.length) {
+        throw new Error('No stock data yet — trigger the GitHub Action to generate it.');
+      }
+
+      allStocks = data.stocks.map(d => ({
+        ticker:    d.ticker    || '',
+        name:      d.name      || '',
+        sector:    d.sector    || '',
+        price:     d.price     || 0,
+        marketCap: d.marketCap || 0,
+        pe:        d.pe        || 0,
+        pb:        d.pb        || 0,
+        roe:       d.roe       != null ? d.roe  : null,
+        de:        d.de        != null ? d.de   : null,
+        fcfYield:  d.fcfYield  || 0,
+        peg:       d.peg       || 0,
       }));
 
-      document.getElementById('api-status').textContent = 'live';
+      const updated = data.generated
+        ? 'updated ' + new Date(data.generated).toLocaleDateString()
+        : 'loaded';
+      document.getElementById('api-status').textContent = updated;
       document.getElementById('loading-indicator').style.display = 'none';
       renderTable(filterStocks(allStocks, currentStrategy));
 
     } catch (err) {
       document.getElementById('api-status').textContent = 'error';
       document.getElementById('loading-indicator').style.display = 'none';
-      document.getElementById('screener-notice').style.display = 'block';
-      document.getElementById('screener-notice').textContent = 'Failed to load data: ' + err.message;
+      const notice = document.getElementById('screener-notice');
+      notice.style.display = 'block';
+      notice.innerHTML = '<strong>Could not load data:</strong> ' + err.message;
     }
   }
 

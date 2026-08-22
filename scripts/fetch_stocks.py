@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+"""
+Fetch fundamental data for S&P 500 stocks via yfinance.
+Outputs stocks-data.json to the repo root.
+
+Field conventions stored in JSON:
+  roe      - return on equity as a percentage (e.g. 15.5 means 15.5%)
+  de       - debt-to-equity as a ratio       (e.g. 0.5  means 0.5x)
+  pe       - trailing P/E ratio
+  pb       - price-to-book ratio
+  peg      - PEG ratio
+  fcfYield - free cash flow yield as a percentage
+  marketCap - raw value in USD
+"""
+
+import json
+import time
+import datetime
+import sys
+
+import pandas as pd
+import yfinance as yf
+
+
+def get_sp500_tickers():
+    """Fetch current S&P 500 ticker list from Wikipedia."""
+    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+    df = pd.read_html(url)[0]
+    # Yahoo Finance uses hyphens where tickers have dots (e.g. BRK.B -> BRK-B)
+    return [t.replace(".", "-") for t in df["Symbol"].tolist()]
+
+
+def fetch_stock(ticker):
+    """
+    Return a dict of fundamentals for one ticker, or None on failure.
+    yfinance info field notes:
+      debtToEquity  - reported as percentage (173.22 means D/E ratio of 1.7322)
+      returnOnEquity - reported as decimal  (0.1496 means 14.96% ROE)
+    """
+    try:
+        info = yf.Ticker(ticker).info
+
+        # Skip non-equity results (sometimes Yahoo returns a minimal dict)
+        if not info or info.get("quoteType") not in ("EQUITY",):
+            return None
+
+        market_cap   = info.get("marketCap") or 0
+        free_cashflow = info.get("freeCashflow") or 0
+
+        # Normalise ROE: decimal → percentage
+        roe_raw = info.get("returnOnEquity")
+        roe = round(roe_raw * 100, 2) if roe_raw is not None else None
+
+        # Normalise D/E: Yahoo percentage → ratio
+        de_raw = info.get("debtToEquity")
+        de = round(de_raw / 100, 3) if de_raw is not None else None
+
+        # FCF yield as percentage of market cap
+        fcf_yield = 0.0
+        if market_cap > 0 and free_cashflow:
+            fcf_yield = round((free_cashflow / market_cap) * 100, 2)
+
+        price = info.get("currentPrice") or info.get("regularMarketPrice") or 0
+
+        return {
+            "ticker":    ticker,
+            "name":      info.get("shortName") or info.get("longName") or ticker,
+            "sector":    info.get("sector", ""),
+            "industry":  info.get("industry", ""),
+            "price":     round(float(price), 2),
+            "marketCap": market_cap,
+            "pe":        round(float(info.get("trailingPE") or 0), 2),
+            "pb":        round(float(info.get("priceToBook") or 0), 2),
+            "roe":       roe,
+            "de":        de,
+            "peg":       round(float(info.get("pegRatio") or 0), 2),
+            "fcfYield":  fcf_yield,
+        }
+
+    except Exception as exc:
+        print(f"  WARN {ticker}: {exc}", file=sys.stderr)
+        return None
+
+
+def main():
+    print("Fetching S&P 500 ticker list from Wikipedia…")
+    tickers = get_sp500_tickers()
+    total = len(tickers)
+    print(f"Found {total} tickers\n")
+
+    stocks = []
+    failed = []
+
+    for i, ticker in enumerate(tickers, 1):
+        print(f"[{i:3}/{total}] {ticker:<8}", end=" ", flush=True)
+        data = fetch_stock(ticker)
+        if data:
+            stocks.append(data)
+            print("ok")
+        else:
+            failed.append(ticker)
+            print("skip")
+        time.sleep(0.25)   # polite delay; avoids rate-limit errors
+
+    output = {
+        "generated": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "count":     len(stocks),
+        "stocks":    stocks,
+    }
+
+    out_path = "stocks-data.json"
+    with open(out_path, "w") as fh:
+        json.dump(output, fh, separators=(",", ":"))
+
+    print(f"\nSaved {len(stocks)} stocks → {out_path}")
+    if failed:
+        print(f"Skipped ({len(failed)}): {', '.join(failed)}")
+
+
+if __name__ == "__main__":
+    main()
