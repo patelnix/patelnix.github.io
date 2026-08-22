@@ -102,6 +102,20 @@ title: Stock Screener
     font-weight: 600;
   }
 
+  .stock-table td.col-name {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .stock-table td.col-sector {
+    max-width: 68px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .stock-table td.positive { color: #5cb85c; }
   .stock-table td.negative { color: #d9534f; }
 
@@ -244,6 +258,22 @@ title: Stock Screener
 </div>
 
 <script>
+  // ─── Sector abbreviations ────────────────────────────────────────────────
+  const SECTOR_ABBR = {
+    'Technology':               'Tech',
+    'Healthcare':               'Health',
+    'Financial Services':       'Fin.',
+    'Industrials':              'Indust.',
+    'Consumer Cyclical':        'C.Cycl.',
+    'Consumer Defensive':       'C.Def.',
+    'Communication Services':   'Comm.',
+    'Energy':                   'Energy',
+    'Basic Materials':          'Matrl.',
+    'Real Estate':              'RE',
+    'Utilities':                'Util.',
+  };
+  const sectorAbbr = s => SECTOR_ABBR[s] || (s.length > 7 ? s.slice(0, 6) + '.' : s);
+
   // ─── Strategy filter state ────────────────────────────────────────────────
   let currentStrategy = 'all';
   let allStocks = [];
@@ -363,8 +393,8 @@ title: Stock Screener
       const scoreClass = score >= 80 ? 'positive' : score >= 50 ? '' : 'negative';
       return `<tr>
         <td class="ticker">${s.ticker}</td>
-        <td>${s.name}</td>
-        <td>${s.sector}</td>
+        <td class="col-name" title="${s.name}">${s.name}</td>
+        <td class="col-sector" title="${s.sector}">${sectorAbbr(s.sector)}</td>
         <td>$${s.price.toFixed(2)}</td>
         <td>${s.pe > 0 ? s.pe.toFixed(1) : '—'}</td>
         <td>${s.pb > 0 ? s.pb.toFixed(2) : '—'}</td>
