@@ -422,7 +422,7 @@ title: Stock Screener
     document.getElementById('api-status').textContent = 'loading…';
 
     try {
-      const res = await fetch('/stocks-data.json');
+      const res = await fetch('https://raw.githubusercontent.com/patelnix/patelnix.github.io/data/stocks-data.json');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
 

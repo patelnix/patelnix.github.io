@@ -9,13 +9,14 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     permissions:
-      contents: write      # needed to push stocks-data.json back to the repo
+      contents: write
 
     steps:
-      - name: Checkout repo
+      - name: Checkout master
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0   # needed so we can fetch the data branch
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,11 +28,22 @@ jobs:
 
       - name: Fetch stock data
         run: python scripts/fetch_stocks.py
+        # writes stocks-data.json to the working directory
 
-      - name: Commit updated data
+      - name: Commit to data branch
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check out the data branch into a separate worktree
+          git fetch origin data
+          git worktree add /tmp/data-branch data
+
+          # Copy the generated file into the data branch worktree
+          cp stocks-data.json /tmp/data-branch/stocks-data.json
+
+          # Commit and push only if the file actually changed
+          cd /tmp/data-branch
           git add stocks-data.json
-          git diff --staged --quiet && echo "No changes" || git commit -m "chore: refresh stock data [skip ci]"
-          git push
+          git diff --staged --quiet && echo "No changes" || git commit -m "chore: refresh stock data"
+          git push origin data
